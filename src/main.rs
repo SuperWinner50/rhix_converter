@@ -26,7 +26,7 @@ fn read_data(v: u16, data_type: &str) -> f64 {
         "PHI" => 360.0 * (v as f64 - 32768.0) / 65535.0,
         "RHO" => 2.0 * (v as f64 - 1.0) / 65534.0,
         "SW" => (v as f64 - 1.0) / 100.0,
-        d => panic!("Unknown datatype {}", d),
+        d => panic!("Unknown datatype [{d}]"),
     }
 }
 
@@ -227,15 +227,14 @@ fn read_file(path: impl AsRef<std::path::Path>) {
         );
 
         for (data_type, name) in all_data_types {
-            if data_type != 0 {
-                let data = readle!(data, u16, gates as usize)
+            let data = readle!(data, u16, gates as usize);
+            if data_type != 0 && name != "" {
+                let data = data
                     .into_iter()
                     .map(|v| read_data(v, name))
                     .collect();
 
-                if name != "" {
-                    ray.data.insert(name.into(), data);
-                }
+                ray.data.insert(name.into(), data);
             }
         }
 
